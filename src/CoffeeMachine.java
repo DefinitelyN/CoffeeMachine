@@ -1,124 +1,149 @@
 import java.util.Scanner;
 
 public class CoffeeMachine {
-    static Scanner scanner = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in);
 
-    static int water = 400;
-    static int milk = 540;
-    static int beans = 120;
-    static int cups = 9;
-    static int money = 550;
+    int current_water = 400;
+    int current_milk = 540;
+    int current_beans = 120;
+    int current_cups = 9;
+    int current_money = 550;
+
+    final String ERROR_GENERAL = "Incorrect action, retry.";
+    final String ERROR_WATER = "Sorry, not enough water!";
+    final String ERROR_MILK = "Sorry, not enough milk!";
+    final String ERROR_BEANS = "Sorry, not enough coffee beans!";
+    final String ERROR_CUPS = "Sorry, not enough disposable cups!";
+    final String SUCCESS_COOK = "I have enough resources, cooking";
 
     public static void main(String[] args) {
-        serve();
+        CoffeeMachine coffeeMachine = new CoffeeMachine();
+        coffeeMachine.serve();
     }
 
-    static void serve() {
-
+    void serve() {
         while (true) {
+            System.out.println("===============");
             System.out.println("Write action (buy, fill, take, " +
                     "remaining, exit):");
             String action = scanner.nextLine().toLowerCase();
             if (action.equals("exit"))
                 break;
             switch (action) {
-                case "buy" -> buy();
+                case "buy" -> System.out.println(buy());
                 case "fill" -> fill();
                 case "take" -> take();
-                case "remaining" -> print();
-                default -> System.out.println("Недопустимое действие");
+                case "remaining" -> remaining();
+                default -> System.out.println(ERROR_GENERAL);
             }
         }
     }
 
-    static void buy() {
-        System.out.println("What do you want to buy? 1 - espresso, " +
-                "2 - latte, 3 - cappuccino, back - to main menu:");
+    String buy() {
+        Espresso espresso = new Espresso();
+        Latte latte = new Latte();
+        Cappuccino cappuccino = new Cappuccino();
+        System.out.println("What do you want to buy (espresso, " +
+                "latte, cappuccino)? Type \"back\" to return main menu:");
         String choiceCoffee = scanner.nextLine().toLowerCase();
         switch (choiceCoffee) {
-            case "1" -> {
-                if (water < 250) {
-                    System.out.println("Sorry, not enough water!");
-                } else if (beans < 16) {
-                    System.out.println("Sorry, not enough coffee beans!");
-                } else if (cups < 1) {
-                    System.out.println("Sorry, not enough disposable cups!");
-                } else {
-                    System.out.println("I have enough resources, " +
-                            "making you a coffee!");
-                    water -= 250;
-                    beans -= 16;
-                    money += 4;
-                    cups -= 1;
-                }
+            case "espresso" -> {
+                return espresso.cook();
             }
-            case "2" -> {
-                if (water < 350) {
-                    System.out.println("Sorry, not enough water!");
-                } else if (milk < 75) {
-                    System.out.println("Sorry, not enough milk!");
-                } else if (beans < 20) {
-                    System.out.println("Sorry, not enough coffee beans!");
-                } else if (cups < 1) {
-                    System.out.println("Sorry, not enough disposable cups!");
-                } else {
-                    System.out.println("I have enough resources, " +
-                            "making you a coffee!");
-                    water -= 350;
-                    milk -= 75;
-                    beans -= 20;
-                    money += 7;
-                    cups -= 1;
-                }
+            case "latte" -> {
+                return latte.cook();
             }
-            case "3" -> {
-                if (water < 200) {
-                    System.out.println("Sorry, not enough water!");
-                } else if (milk < 100) {
-                    System.out.println("Sorry, not enough milk!");
-                } else if (beans < 12) {
-                    System.out.println("Sorry, not enough coffee beans!");
-                } else if (cups < 1) {
-                    System.out.println("Sorry, not enough disposable cups!");
-                } else {
-                    System.out.println("I have enough resources, " +
-                            "making you a coffee!");
-                    water -= 200;
-                    milk -= 100;
-                    beans -= 12;
-                    money += 6;
-                    cups -= 1;
-                }
+            case "cappuccino" -> {
+                return cappuccino.cook();
             }
-            default -> System.out.println("Недопустимое действие");
+            case "back" -> {
+                return "Returning home";
+            }
+            default -> {
+                return ERROR_GENERAL;
+            }
         }
     }
 
-    static void fill() {
-        System.out.println("Write how many ml of water you want to add:");
-        water += scanner.nextInt();
-        System.out.println("Write how many ml of milk you want to add:");
-        milk += scanner.nextInt();
-        System.out.println("Write how many grams of coffee " +
-                "beans you want to add:");
-        beans += scanner.nextInt();
-        System.out.println("Write how many disposable cups of " +
-                "coffee you want to add:");
-        cups += scanner.nextInt();
+    void fill() {
+        System.out.println("Write how many ml of water added:");
+        current_water += scanner.nextInt();
+        System.out.println("Write how many ml of milk added:");
+        current_milk += scanner.nextInt();
+        System.out.println("Write how many grams of coffee added:");
+        current_beans += scanner.nextInt();
+        System.out.println("Write how many disposable cups added:");
+        current_cups += scanner.nextInt();
     }
 
-    static void take() {
-        System.out.println("I gave you $" + money);
-        money = 0;
+    void take() {
+        System.out.println("Output cash $" + current_money);
+        current_money = 0;
     }
 
-    static void print() {
+    void remaining() {
         System.out.println("The coffee machine has:");
-        System.out.println(water + " ml of water");
-        System.out.println(milk + " ml of milk");
-        System.out.println(beans + " g of coffee beans");
-        System.out.println(cups + " disposable cups");
-        System.out.println(money + " of money");
+        System.out.println(current_water + " ml of water");
+        System.out.println(current_milk + " ml of milk");
+        System.out.println(current_beans + " g of coffee beans");
+        System.out.println(current_cups + " disposable cups");
+        System.out.println(current_money + " of money");
     }
 
+    class Coffee {
+        int REQUIRED_WATER;
+        int REQUIRED_MILK;
+        int REQUIRED_BEANS;
+        int REQUIRED_CUPS;
+        int COST_MONEY;
+
+        String cook() {
+            if (current_water < this.REQUIRED_WATER) {
+                return ERROR_WATER;
+            } else if (current_milk < this.REQUIRED_MILK) {
+                return ERROR_MILK;
+            } else if (current_beans < this.REQUIRED_BEANS) {
+                return ERROR_BEANS;
+            } else if (current_cups < this.REQUIRED_CUPS) {
+                return ERROR_CUPS;
+            } else {
+                current_water -= this.REQUIRED_WATER;
+                current_milk -= this.REQUIRED_MILK;
+                current_beans -= this.REQUIRED_BEANS;
+                current_cups -= this.REQUIRED_CUPS;
+                current_money += this.COST_MONEY;
+                return SUCCESS_COOK;
+            }
+        }
+    }
+
+    class Espresso extends Coffee {
+        Espresso() {
+            this.REQUIRED_WATER = 215;
+            this.REQUIRED_MILK = 0;
+            this.REQUIRED_BEANS = 16;
+            this.REQUIRED_CUPS = 1;
+            this.COST_MONEY = 4;
+        }
+    }
+
+    class Latte extends Coffee {
+        Latte() {
+            this.REQUIRED_WATER = 350;
+            this.REQUIRED_MILK = 75;
+            this.REQUIRED_BEANS = 20;
+            this.REQUIRED_CUPS = 1;
+            this.COST_MONEY = 7;
+        }
+    }
+
+    class Cappuccino extends Coffee {
+        Cappuccino() {
+            this.REQUIRED_WATER = 200;
+            this.REQUIRED_MILK = 100;
+            this.REQUIRED_BEANS = 12;
+            this.REQUIRED_CUPS = 1;
+            this.COST_MONEY = 6;
+        }
+    }
 }
