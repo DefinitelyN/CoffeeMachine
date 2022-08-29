@@ -1,8 +1,9 @@
+package definitelyn.coffeemachine;
 import java.util.Scanner;
 
-public class CoffeeMachine {
-    Scanner scanner = new Scanner(System.in);
+public class Machine {
 
+    Scanner scanner = new Scanner(System.in);
     int current_water = 400;
     int current_milk = 540;
     int current_beans = 120;
@@ -16,10 +17,9 @@ public class CoffeeMachine {
     final String ERROR_CUPS = "Sorry, not enough disposable cups!";
     final String SUCCESS_COOK = "I have enough resources, cooking";
 
-    public static void main(String[] args) {
-        CoffeeMachine coffeeMachine = new CoffeeMachine();
-        coffeeMachine.serve();
-    }
+    Espresso espresso = new Espresso();
+    Latte latte = new Latte();
+    Cappuccino cappuccino = new Cappuccino();
 
     void serve() {
         while (true) {
@@ -40,21 +40,18 @@ public class CoffeeMachine {
     }
 
     String buy() {
-        Espresso espresso = new Espresso();
-        Latte latte = new Latte();
-        Cappuccino cappuccino = new Cappuccino();
         System.out.println("What do you want to buy (espresso, " +
                 "latte, cappuccino)? Type \"back\" to return main menu:");
         String choiceCoffee = scanner.nextLine().toLowerCase();
         switch (choiceCoffee) {
             case "espresso" -> {
-                return espresso.cook();
+                return cook(espresso);
             }
             case "latte" -> {
-                return latte.cook();
+                return cook(latte);
             }
             case "cappuccino" -> {
-                return cappuccino.cook();
+                return cook(cappuccino);
             }
             case "back" -> {
                 return "Returning home";
@@ -62,6 +59,25 @@ public class CoffeeMachine {
             default -> {
                 return ERROR_GENERAL;
             }
+        }
+    }
+
+    String cook(Coffee coffee) {
+        if (current_water < coffee.REQUIRED_WATER) {
+            return ERROR_WATER;
+        } else if (current_milk < coffee.REQUIRED_MILK) {
+            return ERROR_MILK;
+        } else if (current_beans < coffee.REQUIRED_BEANS) {
+            return ERROR_BEANS;
+        } else if (current_cups < coffee.REQUIRED_CUPS) {
+            return ERROR_CUPS;
+        } else {
+            current_water -= coffee.REQUIRED_WATER;
+            current_milk -= coffee.REQUIRED_MILK;
+            current_beans -= coffee.REQUIRED_BEANS;
+            current_cups -= coffee.REQUIRED_CUPS;
+            current_money += coffee.COST_MONEY;
+            return SUCCESS_COOK;
         }
     }
 
@@ -88,62 +104,5 @@ public class CoffeeMachine {
         System.out.println(current_beans + " g of coffee beans");
         System.out.println(current_cups + " disposable cups");
         System.out.println(current_money + " of money");
-    }
-
-    class Coffee {
-        int REQUIRED_WATER;
-        int REQUIRED_MILK;
-        int REQUIRED_BEANS;
-        int REQUIRED_CUPS;
-        int COST_MONEY;
-
-        String cook() {
-            if (current_water < this.REQUIRED_WATER) {
-                return ERROR_WATER;
-            } else if (current_milk < this.REQUIRED_MILK) {
-                return ERROR_MILK;
-            } else if (current_beans < this.REQUIRED_BEANS) {
-                return ERROR_BEANS;
-            } else if (current_cups < this.REQUIRED_CUPS) {
-                return ERROR_CUPS;
-            } else {
-                current_water -= this.REQUIRED_WATER;
-                current_milk -= this.REQUIRED_MILK;
-                current_beans -= this.REQUIRED_BEANS;
-                current_cups -= this.REQUIRED_CUPS;
-                current_money += this.COST_MONEY;
-                return SUCCESS_COOK;
-            }
-        }
-    }
-
-    class Espresso extends Coffee {
-        Espresso() {
-            this.REQUIRED_WATER = 215;
-            this.REQUIRED_MILK = 0;
-            this.REQUIRED_BEANS = 16;
-            this.REQUIRED_CUPS = 1;
-            this.COST_MONEY = 4;
-        }
-    }
-
-    class Latte extends Coffee {
-        Latte() {
-            this.REQUIRED_WATER = 350;
-            this.REQUIRED_MILK = 75;
-            this.REQUIRED_BEANS = 20;
-            this.REQUIRED_CUPS = 1;
-            this.COST_MONEY = 7;
-        }
-    }
-
-    class Cappuccino extends Coffee {
-        Cappuccino() {
-            this.REQUIRED_WATER = 200;
-            this.REQUIRED_MILK = 100;
-            this.REQUIRED_BEANS = 12;
-            this.REQUIRED_CUPS = 1;
-            this.COST_MONEY = 6;
-        }
     }
 }
