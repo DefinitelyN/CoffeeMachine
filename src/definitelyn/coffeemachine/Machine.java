@@ -1,9 +1,14 @@
 package definitelyn.coffeemachine;
-import java.util.Scanner;
 
 public class Machine {
 
-    Scanner scanner = new Scanner(System.in);
+
+    ICoffeeMachineControl _control;
+
+    Machine (ICoffeeMachineControl control) {
+        _control = control;
+    }
+
     int current_water = 400;
     int current_milk = 540;
     int current_beans = 120;
@@ -23,37 +28,39 @@ public class Machine {
 
     void serve() {
         while (true) {
-            System.out.println("===============");
-            System.out.println("Write action (buy, fill, take, " +
-                    "remaining, exit):");
-            String action = scanner.nextLine().toLowerCase();
-            if (action.equals("exit"))
+            _control.write("===============");
+            _control.write("Write action (\"B\" for buy, " +
+                            "\"F\" for fill, \"T\" for take, " +
+                    "\"R\" for remaining, \"E\" for exit):");
+            String action = _control.read();
+            if (action.equals("e"))
                 break;
             switch (action) {
-                case "buy" -> System.out.println(buy());
-                case "fill" -> fill();
-                case "take" -> take();
-                case "remaining" -> remaining();
-                default -> System.out.println(ERROR_GENERAL);
+                case "b" -> _control.write(buy());
+                case "f" -> fill();
+                case "t" -> take();
+                case "r" -> remaining();
+                default -> _control.write(ERROR_GENERAL);
             }
         }
     }
 
     String buy() {
-        System.out.println("What do you want to buy (espresso, " +
-                "latte, cappuccino)? Type \"back\" to return main menu:");
-        String choiceCoffee = scanner.nextLine().toLowerCase();
+        _control.write("What do you want to buy (\"E\" for espresso, " +
+                "\"L\" for latte, \"C\" for cappuccino)? " +
+                "Type \"R\" to return main menu:");
+        String choiceCoffee = _control.read();
         switch (choiceCoffee) {
-            case "espresso" -> {
+            case "e" -> {
                 return cook(espresso);
             }
-            case "latte" -> {
+            case "l" -> {
                 return cook(latte);
             }
-            case "cappuccino" -> {
+            case "c" -> {
                 return cook(cappuccino);
             }
-            case "back" -> {
+            case "r" -> {
                 return "Returning home";
             }
             default -> {
@@ -82,27 +89,31 @@ public class Machine {
     }
 
     void fill() {
-        System.out.println("Write how many ml of water added:");
-        current_water += scanner.nextInt();
-        System.out.println("Write how many ml of milk added:");
-        current_milk += scanner.nextInt();
-        System.out.println("Write how many grams of coffee added:");
-        current_beans += scanner.nextInt();
-        System.out.println("Write how many disposable cups added:");
-        current_cups += scanner.nextInt();
+        try {
+            _control.write("Write how many ml of water added:");
+            current_water += Integer.parseInt(_control.read());
+            _control.write("Write how many ml of milk added:");
+            current_milk += Integer.parseInt(_control.read());
+            _control.write("Write how many grams of coffee added:");
+            current_beans += Integer.parseInt(_control.read());
+            _control.write("Write how many disposable cups added:");
+            current_cups += Integer.parseInt(_control.read());
+        } catch (Exception e) {
+            _control.write(ERROR_GENERAL);
+        }
     }
 
     void take() {
-        System.out.println("Output cash $" + current_money);
+        _control.write("Output cash $" + current_money);
         current_money = 0;
     }
 
     void remaining() {
-        System.out.println("The coffee machine has:");
-        System.out.println(current_water + " ml of water");
-        System.out.println(current_milk + " ml of milk");
-        System.out.println(current_beans + " g of coffee beans");
-        System.out.println(current_cups + " disposable cups");
-        System.out.println(current_money + " of money");
+        _control.write("The coffee machine has:");
+        _control.write(current_water + " ml of water");
+        _control.write(current_milk + " ml of milk");
+        _control.write(current_beans + " g of coffee beans");
+        _control.write(current_cups + " disposable cups");
+        _control.write(current_money + " of money");
     }
 }
