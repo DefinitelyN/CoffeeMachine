@@ -1,9 +1,11 @@
 package definitelyn.coffeemachine;
 
-public class MakeCoffee {
+public class Main {
     public static void main(String[] args) {
         SystemConsole systemConsole = new SystemConsole();
-        Machine room256 = new Machine(systemConsole);
-        room256.serve();
+
+        Machine machine = new Machine(systemConsole);
+        machine.serve();
+
     }
 }
